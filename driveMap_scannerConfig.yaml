@@ -1,0 +1,157 @@
+# --- driveMap_scanner Configuration ---
+# Purpose: Configure shared-drive scanning for cloud migration inventory.
+# This file controls scan routing, sampling behavior, file classification,
+# checkpointing, and duplicate-detection settings.
+
+scan_modes:
+
+  # Folders that ALWAYS trigger full recursive scanning.
+  # Use substrings that may appear anywhere in the path.
+  full_scan_paths:
+    - "Demobase"
+    - "HIVAIDS"
+    - "ICPI"
+    - "OHA"
+    - "Spectrum"
+    - "Tools_Software/DAPPS"
+    - "Tools_Software/TAPEC"
+    - "Tools_Software/TASC"
+    - "Tools_Software/SGAC"
+    - "Tools_Software/ScraperDestination/HARVEST"
+
+  # Folders that ALWAYS use sampled scanning.
+  sampled_scan_paths:
+    - "Analysis_Production"
+    - "_Staff"
+    - "_Management"
+    - "_IP-Wide"
+    - "Projects Past"
+    - "Projects Potential"
+    - "Projects Paused"
+    - "z_Archived"
+    - "z_Old"
+    - "zzz_Old"
+
+thresholds:
+
+  # If a folder has more direct files than this, the script uses FULL mode
+  # unless the path matches sampled_scan_paths.
+  file_count_full_mode: 500
+
+sampling:
+
+  # Total target sample size for sampled folders.
+  total_sampled_files: 50
+
+  # Sample composition:
+  # 10 largest + 10 newest + 30 random = 50 total.
+  largest_n: 10
+  newest_n: 10
+  random_n: 30
+
+  # Fixed seed makes sampled results reproducible.
+  random_seed: 42
+
+performance:
+
+  # Limits the pool used for random sampling after largest/newest files
+  # are selected. Helps avoid slow random sampling in huge folders.
+  max_random_pool_size: 5000
+
+  # Write checkpoint after this many scanned folders.
+  checkpoint_frequency: 100
+
+  # Flush CSV after this many rows.
+  csv_flush_frequency: 25
+
+  # Duplicate detection hashes only the first md5_first_bytes bytes
+  # of sampled files. This is a fast duplicate signal, not a full-file hash.
+  duplicate_detection_mode: "off"
+  duplicate_detection: false
+  md5_first_bytes: 1048576
+
+file_groups:
+
+  # Geospatial file indicators.
+  # Expanded beyond your original list to catch common GIS sidecar files,
+  # GeoPackages, KML/KMZ, lidar, and project files.
+  geospatial_extensions:
+    - ".gdb"
+    - ".shp"
+    - ".shx"
+    - ".dbf"
+    - ".prj"
+    - ".sbn"
+    - ".sbx"
+    - ".cpg"
+    - ".tif"
+    - ".tiff"
+    - ".img"
+    - ".vrt"
+    - ".gpkg"
+    - ".geojson"
+    - ".json"
+    - ".kml"
+    - ".kmz"
+    - ".las"
+    - ".laz"
+    - ".mxd"
+    - ".aprx"
+    - ".lyrx"
+    - ".qgz"
+    - ".qgs"
+
+  # Document / office-productivity file indicators.
+  document_extensions:
+    - ".pdf"
+    - ".doc"
+    - ".docx"
+    - ".xls"
+    - ".xlsx"
+    - ".xlsm"
+    - ".ppt"
+    - ".pptx"
+    - ".txt"
+    - ".rtf"
+    - ".csv"
+
+  # Code / script / software-workflow file indicators.
+  software_extensions:
+    - ".py"
+    - ".r"
+    - ".R"
+    - ".sql"
+    - ".ipynb"
+    - ".js"
+    - ".ts"
+    - ".html"
+    - ".css"
+    - ".bat"
+    - ".ps1"
+    - ".sh"
+    - ".java"
+    - ".c"
+    - ".cpp"
+    - ".cs"
+    - ".vb"
+    - ".xml"
+    - ".yaml"
+    - ".yml"
+
+output:
+
+  # Blank columns added to the CSV for later manual review/classification.
+  human_classification_columns:
+    - "business_owner"
+    - "migration_priority"
+    - "target_cloud_pattern"
+    - "retain_archive_delete"
+    - "review_notes"
+
+# Retained from your earlier config for documentation / future expansion.
+# The script version I gave you does not currently use these two blocks directly.
+hashing:
+  max_bytes_to_hash: 1000000
+
+ownership:
+  enabled: true
